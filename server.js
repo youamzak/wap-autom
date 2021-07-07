@@ -2,8 +2,10 @@ const express = require('express')
 const app = express()
 const cookieParser = require('cookie-parser')
 const userRoutes = require('./routes/user.routes')
+const projectRoutes = require('./routes/project.routes')
 require('dotenv').config({path: './config/.env'})
 require('./config/db')
+const {checkUser, requireAuth} = require('./middleware/auth.middleware')
 const cors = require('cors')
 
 const corsOptions = {
@@ -30,6 +32,7 @@ app.get('/jwtid', requireAuth, (req, res) => {
 
 // routes
 app.use('/api/user', userRoutes)
+app.use('/api/project', projectRoutes)
 
 //server 
 app.listen(process.env.PORT, ()=>{
