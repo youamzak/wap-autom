@@ -5,6 +5,7 @@ const projectSchema = new mongoose.Schema(
     infos: {
       type: [
         {
+          clientName: String,
           numElecDraw: String,
           numCommand: String,
           numMachine: String,

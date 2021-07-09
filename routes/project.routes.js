@@ -5,8 +5,8 @@ router.post('/addProject', projectController.addProject)
 router.post('/updateProject/:id', projectController.updateProject)
 router.post('/removeProject/:id', projectController.removeProject)
 
-router.post('/addComment', projectController.addComment)
-router.post('/updateComment', projectController.updateComment)
+router.post('/addComment/:id', projectController.addComment)
+router.post('/updateComment/:id', projectController.updateComment)
 router.post('/removeComment/:id', projectController.removeComment)
 
 router.post('/addBackup', projectController.addBackup)
