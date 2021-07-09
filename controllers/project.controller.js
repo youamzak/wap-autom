@@ -62,12 +62,11 @@ module.exports.addProject = async (req, res) => {
           'Creation of the project by'
         );
 
-        res.status(201).json({ project: docs._id });
+        res.status(201).json({ res: docs._id });
       }
     );
   } catch (error) {
-    console.log(error);
-    res.status(200).send({ error });
+    res.status(200).json({ res : error });
   }
 };
 
@@ -83,30 +82,61 @@ module.exports.updateProject = async (req, res) => {
     updaterId,
   } = req.body;
 
-  try {
-    return ProjectModel.findByIdAndUpdate(req.params.id, {
-      infos: {
-        clientName,
-        numElecDraw,
-        numCommand,
-        numMachine,
-        machineDescription: {
-          sector,
-          designation,
-          comment,
-        },
-      },
-    }).then(() => {
-      addCom(req.params.id, updaterId, 'Project uptdated by')
-      res.status(201).json({ res: "done"});
-    });
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) { // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" }); 
+    }else{
+      try {
+        return ProjectModel.findByIdAndUpdate(
+          req.params.id, 
+          {
+            infos: {
+              clientName,
+              numElecDraw,
+              numCommand,
+              numMachine,
+              machineDescription: {
+                sector,
+                designation,
+                comment,
+              },
+            }
+          }
+        ).then(() => {
+          addCom(req.params.id, updaterId, 'Project updated by')
 
-  } catch (error) {
-    res.status(200).send({ error });
-  }
+          res.status(201).json({ res: "done" })
+        });
+    
+      } catch (error) {
+        res.status(200).json({ res : error });
+      }
+    }
+  })
+
+  
+
 };
 
-module.exports.removeProject = async (req, res) => {};
+module.exports.removeProject = async (req, res) => {
+
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) { // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" }); 
+    }else{
+        return ProjectModel.findByIdAndRemove(
+          req.params.id, 
+          (err, docs) => {
+            if (!err)
+              return res.status(200).json({ res: "done"});
+            else
+              return res.status(201).json({ res: err});
+          }
+        )
+    }
+  })
+
+};
 
 module.exports.addComment = (req, res) => {
   if (!ObjectId.isValid(req.params.id))
