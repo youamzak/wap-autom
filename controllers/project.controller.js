@@ -2,30 +2,30 @@ const { isValidObjectId } = require("mongoose");
 const ObjectId = require("mongoose").Types.ObjectId;
 const ProjectModel = require("../models/project.model");
 const UserModel = require("../models/user.model");
-let userName, userFirstname = "";
 
-const userInfo = async (id) => {
-  UserModel.findById(id, (err, docs) => {
-    if (!err) {
-      userName = docs.name;
-      userFirstname = docs.firstname;
-    } else console.log("ID unknown : " + err);
-  }).select("-password");
-};
-
-const addCom = async (id, text) => {
-  await ProjectModel.findByIdAndUpdate(
-    id,
-    {
-      $push: {
-        comments: {
-          text, //: `Creation of the project by ${userFirstname} ${userName}`,
-          timestamp: Date.now(),
+const addCom = async (idProject,idUser, text) => { 
+  
+  await UserModel.findById(idUser, (err, docs) => {
+    
+    if (err) {
+      console.log("ID unknown : " + err)    
+    }
+  }).select("-password").then(async (req, res) => {
+    await ProjectModel.findByIdAndUpdate(
+      idProject,
+      {
+        $push: {
+          comments: {
+            text : `${text} ${req.name} ${req.firstname}`, 
+            timestamp: Date.now(),
+          },
         },
       },
-    },
-    { upsert: true, new: true }
-  );
+      { upsert: true, new: true }
+    );
+  });
+
+ 
 };
 
 module.exports.addProject = async (req, res) => {
@@ -41,8 +41,6 @@ module.exports.addProject = async (req, res) => {
   } = req.body;
 
   try {
-    userInfo(creatorId);
-
     const project = await ProjectModel.create(
       {
         infos: {
@@ -60,7 +58,8 @@ module.exports.addProject = async (req, res) => {
       (err, docs) => {
         addCom(
           docs._id,
-          `Creation of the project by ${userFirstname} ${userName}`
+          creatorId,
+          'Creation of the project by'
         );
 
         res.status(201).json({ project: docs._id });
@@ -98,35 +97,10 @@ module.exports.updateProject = async (req, res) => {
         },
       },
     }).then(() => {
-      userInfo(updaterId);
-      addCom(req.params.id, `Project uptdated by ${userFirstname} ${userName}`);
-      res.status(201).json({ project: req.params.id });
+      addCom(req.params.id, updaterId, 'Project uptdated by')
+      res.status(201).json({ res: "done"});
     });
 
-    // async () => {
-    // UserModel.findById(updaterId, (err, docs) => {
-    //   if(!err) {
-    //     userName = docs.name
-    //     userFirstname = docs.userFirstname
-    //   }
-    //   else console.log('ID unknown : ' + err);
-    // }).select("-password")
-
-    // await ProjectModel.findByIdAndUpdate(
-    //   req.params.id,
-    //   {
-    //     $push : {
-    //       comments : {
-    //         text : `Project uptdated by ${userFirstname} ${userName}`,
-    //         timestamp : Date.now()
-    //         }
-    //     }
-    //   },
-    //   { upsert: true, new: true }
-    // )
-
-    //res.status(201).json({project: req.params.id})
-    //});
   } catch (error) {
     res.status(200).send({ error });
   }
