@@ -5,21 +5,21 @@ const projectSchema = new mongoose.Schema(
     clientName: {
       type: String,
       required: true,
-      minlenght: 1,
+      minLength: 1,
       max: 55,
       trim: true
     },
     numCommand: {
       type: String,
       required: true,
-      minlenght: 1,
+      minLength: 1,
       max: 55,
       trim: true
     },
     numMachine: {
       type: String,
       required: true,
-      minlenght: 1,
+      minLength: 1,
       max: 55,
       trim: true,
       unique: true
@@ -27,7 +27,7 @@ const projectSchema = new mongoose.Schema(
     numElecDraw: {
       type: String,
       required: true,
-      minlenght: 1,
+      minLength: 1,
       max: 55,
       trim: true,
       unique: true
@@ -44,7 +44,15 @@ const projectSchema = new mongoose.Schema(
             connectionMethod: String,
             connectionAccount: String,
             connectionLogin: String,
-            connectionPassword: String
+            type :{
+              connectionPassword: {
+                type: String,
+                required: true,
+                minLength: 8,
+                max: 1024
+              }
+            }
+            
           }
         }
       ,
