@@ -19,6 +19,8 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.13",
     "multer": "^2.0.0-rc.1",
+    "node-opcua": "^2.47.0",
+    "node-opcua-client": "^2.47.0",
     "nodemon": "^2.0.7",
     "validator": "^13.6.0"
   }

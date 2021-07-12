@@ -2,13 +2,39 @@ const mongoose = require('mongoose')
 
 const projectSchema = new mongoose.Schema(
   {
+    clientName: {
+      type: String,
+      required: true,
+      minlenght: 1,
+      max: 55,
+      trim: true
+    },
+    numCommand: {
+      type: String,
+      required: true,
+      minlenght: 1,
+      max: 55,
+      trim: true
+    },
+    numMachine: {
+      type: String,
+      required: true,
+      minlenght: 1,
+      max: 55,
+      trim: true,
+      unique: true
+    },
+    numElecDraw: {
+      type: String,
+      required: true,
+      minlenght: 1,
+      max: 55,
+      trim: true,
+      unique: true
+    },
     infos: {
-      type: [
+      type: 
         {
-          clientName: String,
-          numElecDraw: String,
-          numCommand: String,
-          numMachine: String,
           machineDescription: {
             sector: String,
             designation: String,
@@ -21,7 +47,7 @@ const projectSchema = new mongoose.Schema(
             connectionPassword: String
           }
         }
-      ],
+      ,
       required: true
     },
     comments: {

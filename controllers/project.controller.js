@@ -38,29 +38,41 @@ module.exports.addProject = async (req, res) => {
     designation,
     comment,
     creatorId,
+    connectionMethod,
+    connectionAccount,
+    connectionLogin,
+    connectionPassword
   } = req.body;
 
   try {
     const project = await ProjectModel.create(
       {
-        infos: {
-          clientName,
-          numElecDraw,
-          numCommand,
-          numMachine,
+        clientName,
+        numElecDraw,
+        numCommand,
+        numMachine,
+        infos: {          
           machineDescription: {
             sector,
             designation,
             comment,
           },
+          connectionDescription: {
+            connectionMethod,
+            connectionAccount,
+            connectionLogin,
+            connectionPassword
+          },
         },
       },
       (err, docs) => {
-        addCom(
-          docs._id,
-          creatorId,
-          'Creation of the project by'
-        );
+        if (!err) {
+          addCom(
+            docs._id,
+            creatorId,
+            'Creation of the project by'
+          );
+        }        
 
         res.status(201).json({ res: docs._id });
       }
@@ -80,6 +92,10 @@ module.exports.updateProject = async (req, res) => {
     designation,
     comment,
     updaterId,
+    connectionMethod,
+    connectionAccount,
+    connectionLogin,
+    connectionPassword
   } = req.body;
 
   await ProjectModel.findById(req.params.id, (err, docs) => {
@@ -90,15 +106,21 @@ module.exports.updateProject = async (req, res) => {
         return ProjectModel.findByIdAndUpdate(
           req.params.id, 
           {
+            clientName,
+            numElecDraw,
+            numCommand,
+            numMachine,
             infos: {
-              clientName,
-              numElecDraw,
-              numCommand,
-              numMachine,
               machineDescription: {
                 sector,
                 designation,
                 comment,
+              },
+              connectionDescription: {
+                connectionMethod,
+                connectionAccount,
+                connectionLogin,
+                connectionPassword
               },
             }
           }
@@ -129,6 +151,26 @@ module.exports.removeProject = async (req, res) => {
           (err, docs) => {
             if (!err)
               return res.status(200).json({ res: "done"});
+            else
+              return res.status(201).json({ res: err});
+          }
+        )
+    }
+  })
+
+};
+
+module.exports.getProject = async (req, res) => {
+
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) { // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" }); 
+    }else{
+        return ProjectModel.findById(
+          req.params.id, 
+          (err, docs) => {
+            if (!err)
+              return res.status(200).json({ res: docs});
             else
               return res.status(201).json({ res: err});
           }
