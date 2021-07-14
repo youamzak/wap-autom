@@ -2,30 +2,32 @@ const { isValidObjectId } = require("mongoose");
 const ObjectId = require("mongoose").Types.ObjectId;
 const ProjectModel = require("../models/project.model");
 const UserModel = require("../models/user.model");
+const { addProjectError } = require("../errors/project.errors");
 
-const addCom = async (idProject,idUser, text) => { 
-  
+const addCom = async (idProject, idUser, text) => {
   await UserModel.findById(idUser, (err, docs) => {
-    
     if (err) {
-      console.log("ID unknown : " + err)    
+      console.log("ID unknown : " + err);
     }
-  }).select("-password").then(async (req, res) => {
-    await ProjectModel.findByIdAndUpdate(
-      idProject,
-      {
-        $push: {
-          comments: {
-            text : `${text} ${req.name} ${req.firstname}`, 
-            timestamp: Date.now(),
+  })
+    .select("-password")
+    .then(async (req, res) => {
+      await ProjectModel.findByIdAndUpdate(
+        idProject,
+        {
+          $push: {
+            comments: {
+              commenterId: req._id,
+              commenterName: req.name,
+              commenterFirstname: req.firstname,
+              text: text,
+              timestamp: Date.now(),
+            },
           },
         },
-      },
-      { upsert: true, new: true }
-    );
-  });
-
- 
+        { upsert: true, new: true }
+      );
+    });
 };
 
 module.exports.addProject = async (req, res) => {
@@ -41,7 +43,7 @@ module.exports.addProject = async (req, res) => {
     connectionMethod,
     connectionAccount,
     connectionLogin,
-    connectionPassword
+    connectionPassword,
   } = req.body;
 
   try {
@@ -51,34 +53,29 @@ module.exports.addProject = async (req, res) => {
         numElecDraw,
         numCommand,
         numMachine,
-        infos: {          
-          machineDescription: {
-            sector,
-            designation,
-            comment,
-          },
-          connectionDescription: {
-            connectionMethod,
-            connectionAccount,
-            connectionLogin,
-            connectionPassword
-          },
+        machineDescription: {
+          sector,
+          designation,
+          comment,
+        },
+        connectionDescription: {
+          connectionMethod,
+          connectionAccount,
+          connectionLogin,
+          connectionPassword,
         },
       },
       (err, docs) => {
         if (!err) {
-          addCom(
-            docs._id,
-            creatorId,
-            'Creation of the project by'
-          );
-        }        
-
-        res.status(201).json({ res: docs._id });
+          addCom(docs._id, creatorId, "Creation of the project by");
+          res.status(201).json({ res: docs._id });
+        } else {
+          res.status(200).json({ res: addProjectError(err) });
+        }
       }
     );
   } catch (error) {
-    res.status(200).json({ res : error });
+    res.status(200).json({ res: error.toString() });
   }
 };
 
@@ -95,128 +92,174 @@ module.exports.updateProject = async (req, res) => {
     connectionMethod,
     connectionAccount,
     connectionLogin,
-    connectionPassword
+    connectionPassword,
   } = req.body;
 
   await ProjectModel.findById(req.params.id, (err, docs) => {
-    if (err || !docs) { // Control if the id of the project exists
-      return res.status(400).json({ res: "Project unknown" }); 
-    }else{
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
       try {
-        return ProjectModel.findByIdAndUpdate(
-          req.params.id, 
-          {
-            clientName,
-            numElecDraw,
-            numCommand,
-            numMachine,
-            infos: {
-              machineDescription: {
-                sector,
-                designation,
-                comment,
-              },
-              connectionDescription: {
-                connectionMethod,
-                connectionAccount,
-                connectionLogin,
-                connectionPassword
-              },
-            }
-          }
-        ).then(() => {
-          addCom(req.params.id, updaterId, 'Project updated by')
+        return ProjectModel.findByIdAndUpdate(req.params.id, {
+          clientName,
+          numElecDraw,
+          numCommand,
+          numMachine,
+          machineDescription: {
+            sector,
+            designation,
+            comment,
+          },
+          connectionDescription: {
+            connectionMethod,
+            connectionAccount,
+            connectionLogin,
+            connectionPassword,
+          },
+        }).then(() => {
+          addCom(req.params.id, updaterId, "Project updated by");
 
-          res.status(201).json({ res: "done" })
+          res.status(201).json({ res: "done" });
         });
-    
       } catch (error) {
-        res.status(200).json({ res : error });
+        res.status(200).json({ res: error });
       }
     }
-  })
-
-  
-
+  });
 };
 
 module.exports.removeProject = async (req, res) => {
-
   await ProjectModel.findById(req.params.id, (err, docs) => {
-    if (err || !docs) { // Control if the id of the project exists
-      return res.status(400).json({ res: "Project unknown" }); 
-    }else{
-        return ProjectModel.findByIdAndRemove(
-          req.params.id, 
-          (err, docs) => {
-            if (!err)
-              return res.status(200).json({ res: "done"});
-            else
-              return res.status(201).json({ res: err});
-          }
-        )
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      return ProjectModel.findByIdAndRemove(req.params.id, (err, docs) => {
+        if (!err) return res.status(200).json({ res: "done" });
+        else return res.status(201).json({ res: err });
+      });
     }
-  })
-
+  });
 };
 
 module.exports.getProject = async (req, res) => {
-
   await ProjectModel.findById(req.params.id, (err, docs) => {
-    if (err || !docs) { // Control if the id of the project exists
-      return res.status(400).json({ res: "Project unknown" }); 
-    }else{
-        return ProjectModel.findById(
-          req.params.id, 
-          (err, docs) => {
-            if (!err)
-              return res.status(200).json({ res: docs});
-            else
-              return res.status(201).json({ res: err});
-          }
-        )
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      return ProjectModel.findById(req.params.id, (err, docs) => {
+        if (!err) return res.status(200).json({ res: docs });
+        else return res.status(201).json({ res: err });
+      });
     }
-  })
+  });
+};
 
+module.exports.getAllProject = async (req, res) => {
+  const projects = await ProjectModel.find();
+  return res.status(200).json({ res: projects });
 };
 
 module.exports.addComment = (req, res) => {
-  if (!ObjectId.isValid(req.params.id))
-    // req.params.id = Id of the project
-    return res.status(400).json({ error: "ID unknown : " + req.params.id });
+  addCom(req.params.id, req.body.userId, req.body.text);
 
-  const { commenterId, commenterName, commenterFirstname, text } = req.body;
-
-  try {
-    return ProjectModel.findByIdAndUpdate(
-      req.params.id,
-      {
-        $push: {
-          comments: {
-            commenterId,
-            commenterName,
-            commenterFirstname,
-            text,
-            timestamp: Date.now(),
-          },
-        },
-      },
-      { upsert: true, new: true },
-      (err, docs) => {
-        if (!err) {
-          return res.status(201).send({ project: docs });
-        } else {
-          res.status(400).json({ error: err });
-        }
-      }
-    );
-  } catch (error) {
-    res.status(400).json({ error });
-  }
+  return res.status(201).send({ res: "done" });
 };
 
-module.exports.updateComment = async (req, res) => {};
+module.exports.updateComment = async (req, res) => {
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      return ProjectModel.findById(
+        req.params.id,
+        (err, docs) => {
+          const commToUpd = docs.comments.find((comment) => 
+            comment._id.equals(req.body.idComment)
+          )
 
-module.exports.removeComment = async (req, res) => {};
+          if (!commToUpd) return res.status(404).json({res : "Comment not found"})
+          commToUpd.text = req.body.text
+
+          return docs.save((err) => {
+            if (!err) return res.status(200).json({res : docs})
+            else return res.status(500).json({res : err})
+          })
+        }
+      );
+    }
+  });
+};
+
+module.exports.removeComment = async (req, res) => {
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      return ProjectModel.findByIdAndUpdate(
+        req.params.id,
+        {
+          $pull: {
+            comments: {
+              _id: req.body.idComment,
+            },
+          },
+        },
+        { new: true },
+        (err, docs) => {
+          if (!err) return res.status(200).json({ res: docs });
+          else return res.status(200).json({ res: err });
+        }
+      );
+    }
+  });
+};
+
+module.exports.getComment = async (req, res) => {
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      return ProjectModel.findById(
+        req.params.id,
+        (err, docs) => {
+          const commToRead = docs.comments.find((comment) => 
+            comment._id.equals(req.body.idComment)
+          )
+
+          if (!commToRead) 
+            return res.status(404).json({res : "Comment not found"})
+
+          res.status(200).json({res : commToRead})
+
+        }
+      );
+    }
+  });
+};
+
+module.exports.getAllComment = async (req, res) => {
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      return ProjectModel.findById(
+        req.params.id,
+        (err, docs) => {
+          
+          res.status(200).json({res : docs.comments})
+
+        }
+      );
+    }
+  });
+};
+
 
 module.exports.addBackup = async (req, res) => {};

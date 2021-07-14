@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const projectSchema = new mongoose.Schema(
   {
@@ -6,57 +6,47 @@ const projectSchema = new mongoose.Schema(
       type: String,
       required: true,
       minLength: 1,
-      max: 55,
-      trim: true
+      maxLength: 55,
+      trim: true,
     },
     numCommand: {
       type: String,
       required: true,
       minLength: 1,
-      max: 55,
-      trim: true
+      maxLength: 55,
+      trim: true,
     },
     numMachine: {
       type: String,
       required: true,
       minLength: 1,
-      max: 55,
+      maxLength: 55,
       trim: true,
-      unique: true
+      unique: true,
     },
     numElecDraw: {
       type: String,
       required: true,
       minLength: 1,
-      max: 55,
+      maxLength: 55,
       trim: true,
-      unique: true
+      unique: true,
     },
-    infos: {
-      type: 
-        {
-          machineDescription: {
-            sector: String,
-            designation: String,
-            comment: String,
-          },
-          connectionDescription: {
-            connectionMethod: String,
-            connectionAccount: String,
-            connectionLogin: String,
-            type :{
-              connectionPassword: {
-                type: String,
-                required: true,
-                minLength: 8,
-                max: 1024
-              }
-            }
-            
-          }
-        }
-      ,
-      required: true
+    machineDescription: {
+        sector: String,
+        designation: String,
+        comment: String,
+    },
+    connectionDescription: {
+        connectionMethod : String,
+        connectionAccount : String,
+        connectionLogin : String,
+        connectionPassword: {
+          type: String,
+          minLength: 8,
+          maxLength: 1024,
+        },
+      
     },
     comments: {
       type: [
@@ -65,27 +55,27 @@ const projectSchema = new mongoose.Schema(
           commenterName: String,
           commenterFirstname: String,
           text: String,
-          timestamp: Number
-        }
+          timestamp: Number,
+        },
       ],
-      required: true
+      required: true,
     },
-    backUp: {
+    files: {
       type: [
         {
           commenterId: String,
           commenterName: String,
           commenterFirstname: String,
           text: String,
-          timestamp: Number
-        }
+          timestamp: Number,
+        },
       ],
-      required: true
+      required: true,
     },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
-)
+);
 
-module.exports = mongoose.model("project", projectSchema)
+module.exports = mongoose.model("project", projectSchema);
