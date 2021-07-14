@@ -1,5 +1,4 @@
 const { isValidObjectId } = require("mongoose");
-const ObjectId = require("mongoose").Types.ObjectId;
 const ProjectModel = require("../models/project.model");
 const UserModel = require("../models/user.model");
 const { addProjectError } = require("../errors/project.errors");
