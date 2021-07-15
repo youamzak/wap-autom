@@ -70,3 +70,19 @@ module.exports.multiple = async (req, res) => {
     }
   });
 };
+
+module.exports.remove = async (req, res) => {
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      const fileToRemove = `./uploads/${req.params.id}/${req.body.filename}`;
+      fs.rm(fileToRemove, (err, docs) => {
+        if (!err) res.status(200).json({res : "done"})
+        else res.status(200).json({res : `${req.body.filename} doesn't exist`})
+      }) 
+    }
+  });
+
+}
