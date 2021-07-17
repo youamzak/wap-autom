@@ -2,6 +2,16 @@ const { isValidObjectId } = require("mongoose");
 const ProjectModel = require("../models/project.model");
 const UserModel = require("../models/user.model");
 const { addProjectError } = require("../errors/project.errors");
+const CryptoJS = require('crypto-js')
+
+const encrypt = (text, token) => {
+  return CryptoJS.AES.encrypt(text, token).toString()
+}
+
+const decrypt = (text, token) => {
+  const bytes = CryptoJS.AES.decrypt(text, token)
+  return bytes.toString(CryptoJS.enc.Utf8)
+}
 
 const addCom = async (idProject, idUser, text) => {
   await UserModel.findById(idUser, (err, docs) => {
@@ -61,13 +71,13 @@ module.exports.addProject = async (req, res) => {
           connectionMethod,
           connectionAccount,
           connectionLogin,
-          connectionPassword,
+          connectionPassword : encrypt(connectionPassword,process.env.TOKEN_CRYPT),
         },
       },
       (err, docs) => {
         if (!err) {
           addCom(docs._id, creatorId, "Creation of the project by");
-          res.status(201).json({ res: docs._id });
+          res.status(201).json({ res: docs });
         } else {
           res.status(200).json({ res: addProjectError(err) });
         }
@@ -116,11 +126,14 @@ module.exports.updateProject = async (req, res) => {
             connectionLogin,
             connectionPassword,
           },
-        }).then(() => {
-          addCom(req.params.id, updaterId, "Project updated by");
+        }).then((err, docs) => {
+            addCom(req.params.id, updaterId, "Project updated by");
 
-          res.status(201).json({ res: "done" });
-        });
+            res.status(201).json({ res: docs });
+          
+        }).catch((error)=>{
+          res.status(201).json({ res: error });
+        })
       } catch (error) {
         res.status(200).json({ res: error });
       }
@@ -161,10 +174,27 @@ module.exports.getAllProject = async (req, res) => {
   return res.status(200).json({ res: projects });
 };
 
-module.exports.addComment = (req, res) => {
-  addCom(req.params.id, req.body.userId, req.body.text);
+module.exports.getPasswordConnection = async (req, res) => {
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      return ProjectModel.findById(req.params.id, (err, docs) => {
+        if (!err) {
+          return res.status(200).json({ res: decrypt(docs.connectionDescription.connectionPassword, process.env.TOKEN_CRYPT) });
+        }
+        else return res.status(201).json({ res: err });
+      });
+    }
+  });
+};
 
-  return res.status(201).send({ res: "done" });
+module.exports.addComment = (req, res) => {
+
+  addCom(req.params.id, req.body.userId, req.body.text);
+  if(!req.body.lock) //Only from upload file request. Used not to send the response twice
+    return res.status(201).send({ res: "done" });
 };
 
 module.exports.updateComment = async (req, res) => {
@@ -260,5 +290,3 @@ module.exports.getAllComment = async (req, res) => {
   });
 };
 
-
-module.exports.addBackup = async (req, res) => {};

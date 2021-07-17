@@ -60,18 +60,7 @@ const projectSchema = new mongoose.Schema(
       ],
       required: true,
     },
-    files: {
-      type: [
-        {
-          commenterId: String,
-          commenterName: String,
-          commenterFirstname: String,
-          text: String,
-          timestamp: Number,
-        },
-      ],
-      required: true,
-    },
+    
   },
   {
     timestamps: true,

@@ -1,7 +1,21 @@
 const ProjectModel = require("../models/project.model");
 const UserModel = require("../models/user.model");
 const fs = require("fs");
+const {addComment} = require('./project.controller')
 
+const addUploadComm = (req, res, text) => {
+  const reqComment = {
+    params : {
+      id : req.params.id
+    },
+    body : {
+      userId : req.body.userId,
+      lock : true,
+      text
+    }
+  }
+  addComment(reqComment, res)
+}
 const moveFile = (oldFile, newFile) => {
   fs.rename(oldFile, newFile, (err, docs) => {
     if (!err) return "done" ;
@@ -23,14 +37,14 @@ module.exports.single = async (req, res) => {
         if (!stats) {
           fs.mkdir(path, (err, docs) => {
             if (!err) {
-              moveFile(fileNamePath, `${path}/${fileName}`);
-              res.status(200).json({ res: "done" });
+              moveFile(fileNamePath, `${path}/${fileName}`);   
             } else res.status(200).json({ res: err });
           });
         } else {
           moveFile(fileNamePath, `${path}/${fileName}`);
-          res.status(200).json({ res: "done" });
         }
+        addUploadComm(req, res, `Upload of the file ${fileName}`)
+        res.status(200).json({ res: "done" });
       });
     }
   });
@@ -54,6 +68,7 @@ module.exports.multiple = async (req, res) => {
                 let fileNamePath = `./uploads/${file.filename}`;
                 let fileNameTmp = file.filename;
                 moveFile(fileNamePath, `${path}/${fileNameTmp}`);
+                addUploadComm(req, res, `Upload of the file ${fileNameTmp}`)
               });
               res.status(201).json({res : "done"})
             }
@@ -63,9 +78,11 @@ module.exports.multiple = async (req, res) => {
             let fileNamePath = `./uploads/${file.filename}`;
             let fileNameTmp = file.filename;
             moveFile(fileNamePath, `${path}/${fileNameTmp}`);
+            addUploadComm(req, res, `Upload of the file ${fileNameTmp}`)
           });
           res.status(201).json({res : "done"})
         }
+        
       });     
     }
   });
@@ -82,7 +99,23 @@ module.exports.remove = async (req, res) => {
         if (!err) res.status(200).json({res : "done"})
         else res.status(200).json({res : `${req.body.filename} doesn't exist`})
       }) 
+      addUploadComm(req, res, `Remove of the file ${req.body.filename}`)
     }
   });
 
+}
+
+module.exports.getFiles = async (req, res) => {
+  await ProjectModel.findById(req.params.id, (err, docs) => {
+    if (err || !docs) {
+      // Control if the id of the project exists
+      return res.status(400).json({ res: "Project unknown" });
+    } else {
+      const path = `./uploads/${req.params.id}`;
+      fs.readdir(path, (err, files) => {
+        res.status(200).json({ res: files });
+      }) 
+      
+    }
+  });
 }
