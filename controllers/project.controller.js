@@ -124,7 +124,7 @@ module.exports.updateProject = async (req, res) => {
             connectionMethod,
             connectionAccount,
             connectionLogin,
-            connectionPassword,
+            connectionPassword : encrypt(connectionPassword,process.env.TOKEN_CRYPT),
           },
         }).then((err, docs) => {
             addCom(req.params.id, updaterId, "Project updated by");
@@ -182,7 +182,11 @@ module.exports.getPasswordConnection = async (req, res) => {
     } else {
       return ProjectModel.findById(req.params.id, (err, docs) => {
         if (!err) {
-          return res.status(200).json({ res: decrypt(docs.connectionDescription.connectionPassword, process.env.TOKEN_CRYPT) });
+          return res.status(200).json({ res: {
+            account : docs.connectionDescription.connectionAccount,
+            login : docs.connectionDescription.connectionLogin,
+            password : decrypt(docs.connectionDescription.connectionPassword, process.env.TOKEN_CRYPT) }}
+            );
         }
         else return res.status(201).json({ res: err });
       });

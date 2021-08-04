@@ -32,6 +32,10 @@ const projectSchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
+    customerLogo: {
+      type: String,
+      maxLength: 255
+    },
     machineDescription: {
         sector: String,
         designation: String,
