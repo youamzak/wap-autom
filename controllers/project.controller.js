@@ -169,7 +169,20 @@ module.exports.getProject = async (req, res) => {
   });
 };
 
-module.exports.getAllProject = async (req, res) => {
+module.exports.getAllProjectLight = async (req, res) => {
+  const projects = 
+    await ProjectModel.find()
+    .select("-machineDescription")
+    .select("-connectionDescription")
+    .select("-comments");
+    /*
+    .select("-connectionDescription.connectionAccount")
+    .select("-connectionDescription.connectionLogin")
+    .select("-connectionDescription.connectionPassword");*/
+  return res.status(200).json({ res: projects });
+};
+
+module.exports.getAllProjectFull = async (req, res) => {
   const projects = 
     await ProjectModel.find()
     .select("-connectionDescription.connectionAccount")
