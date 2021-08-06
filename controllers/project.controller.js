@@ -71,12 +71,12 @@ module.exports.addProject = async (req, res) => {
           connectionMethod,
           connectionAccount,
           connectionLogin,
-          connectionPassword : encrypt(connectionPassword,process.env.TOKEN_CRYPT),
+          connectionPassword : connectionPassword ? encrypt(connectionPassword,process.env.TOKEN_CRYPT) : '',
         },
       },
       (err, docs) => {
         if (!err) {
-          addCom(docs._id, creatorId, "Creation of the project by");
+          addCom(docs._id, creatorId, "Creation of the project");
           res.status(201).json({ res: docs });
         } else {
           res.status(200).json({ res: addProjectError(err) });
@@ -86,6 +86,7 @@ module.exports.addProject = async (req, res) => {
   } catch (error) {
     res.status(200).json({ res: error.toString() });
   }
+  
 };
 
 module.exports.updateProject = async (req, res) => {

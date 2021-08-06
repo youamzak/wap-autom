@@ -47,7 +47,6 @@ const projectSchema = new mongoose.Schema(
         connectionLogin : String,
         connectionPassword: {
           type: String,
-          minLength: 8,
           maxLength: 1024,
         },
       
