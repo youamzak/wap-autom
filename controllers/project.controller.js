@@ -170,7 +170,11 @@ module.exports.getProject = async (req, res) => {
 };
 
 module.exports.getAllProject = async (req, res) => {
-  const projects = await ProjectModel.find();
+  const projects = 
+    await ProjectModel.find()
+    .select("-connectionDescription.connectionAccount")
+    .select("-connectionDescription.connectionLogin")
+    .select("-connectionDescription.connectionPassword");
   return res.status(200).json({ res: projects });
 };
 
