@@ -11,7 +11,7 @@ module.exports.addProjectError = (err) => {
   }
 
   switch (keyPattern) {
-    case ("clientName"):
+    case ("customerName"):
       errorMessage = `Error Name Customer: ${keyValue} is too short or empty`;
       break;
     case ("numCommand"):

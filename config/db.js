@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 
 mongoose
-  .connect(`mongodb://${process.env.DB_USER_PASS}@localhost:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false`, 
+  .connect(`mongodb://${process.env.DB_USER_PASS}${process.env.DB_HOST}/wap-automation?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&ssl=false`, 
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,

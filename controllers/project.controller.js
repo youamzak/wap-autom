@@ -41,7 +41,7 @@ const addCom = async (idProject, idUser, text) => {
 
 module.exports.addProject = async (req, res) => {
   const {
-    clientName,
+    customerName,
     numElecDraw,
     numCommand,
     numMachine,
@@ -58,7 +58,7 @@ module.exports.addProject = async (req, res) => {
   try {
     const project = await ProjectModel.create(
       {
-        clientName,
+        customerName,
         numElecDraw,
         numCommand,
         numMachine,
@@ -91,7 +91,7 @@ module.exports.addProject = async (req, res) => {
 
 module.exports.updateProject = async (req, res) => {
   const {
-    clientName,
+    customerName,
     numElecDraw,
     numCommand,
     numMachine,
@@ -112,7 +112,7 @@ module.exports.updateProject = async (req, res) => {
     } else {
       try {
         return ProjectModel.findByIdAndUpdate(req.params.id, {
-          clientName,
+          customerName,
           numElecDraw,
           numCommand,
           numMachine,
