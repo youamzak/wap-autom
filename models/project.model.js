@@ -40,6 +40,16 @@ const projectSchema = new mongoose.Schema(
         sector: String,
         designation: String,
         comment: String,
+        materials: {
+          type : [
+            {
+              id: String,
+              material: String,
+              brand: String,
+              ref: String
+            }
+          ]
+        }
     },
     connectionDescription: {
         connectionMethod : String,

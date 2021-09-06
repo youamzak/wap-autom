@@ -16,13 +16,13 @@ module.exports.checkUser = (req, res, next) => {
       }
     })
   }else{
-    res.locals.user = null
-    next()
+    res.locals.user = null;
+    next();
   }
 }
 
 module.exports.requireAuth = (req, res, next) => {
-  const token = req.cookie.jwt
+  const token = req.cookies.jwt
 
   if(token) {
     jwt.verify(token, process.env.TOKEN_SECRET, async (err, decodedToken) => {
@@ -39,3 +39,5 @@ module.exports.requireAuth = (req, res, next) => {
   }
 
 }
+
+//module.exports = authJwt;
