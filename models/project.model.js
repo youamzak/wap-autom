@@ -60,25 +60,34 @@ const projectSchema = new mongoose.Schema(
           maxLength: 1024,
         },
       
-    },
+    }, 
     comments: {
       type: [
         {
-          commenterId: String,
-          commenterName: String,
-          commenterFirstname: String,
+          commenterId: {type : mongoose.Schema.Types.ObjectId, ref:"user"},
           text: String,
           timestamp: Number,
         },
       ],
       required: true,
-    },
-    
+    },   
   },
   {
     timestamps: true,
   }
 );
 
+// comments: {
+//   type: [
+//     {
+//       commenterId: String,
+//       commenterName: String,
+//       commenterFirstname: String,
+//       text: String,
+//       timestamp: Number,
+//     },
+//   ],
+//   required: true,
+// },
 
 module.exports = mongoose.model("project", projectSchema);
