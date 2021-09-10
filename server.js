@@ -6,10 +6,7 @@ const projectRoutes = require("./routes/project.routes");
 const uploadRoutes = require("./routes/upload.routes");
 require("dotenv").config({ path: "./config/.env" });
 require("./config/db");
-const {
-  checkUser,
-  requireAuth,
-} = require("./middleware/auth.middleware");
+const { checkUser, requireAuth } = require("./middleware/auth.middleware");
 const cors = require("cors");
 
 const corsOptions = {
@@ -29,17 +26,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // jwt
-app.get("*", checkUser);
+//app.use('*',checkUser)
 app.get("/jwtid", requireAuth, (req, res) => {
-  if(res.locals.user)
-    res.status(200).send(res.locals.user._id);
-  else
-    res.status(200).send(null);
+  if (res.locals.user) res.status(200).send(res.locals.user._id);
+  else res.status(200).send(null);
 });
 
 // routes
 app.use("/api/user", userRoutes);
-app.use("/api/project", projectRoutes);
+app.use("/api/project", checkUser, (req, res) => {
+  if (res.statusCode !== 401)
+    projectRoutes
+});
 app.use("/api/upload", uploadRoutes);
 
 //server
