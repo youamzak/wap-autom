@@ -10,7 +10,7 @@ const controlProjectId = async (id, path) => {
 };
 
 module.exports.checkProjectIds = async (req, res, next) => {
-  if (req.statusCode !== 400) {
+  if (req.statusCode !== 400 || req.statusCode !== 401) {
     if (await controlProjectId(req.params.id, "_id")) {
       //Control idComment for request getComment
       if (req.body.idComment) {

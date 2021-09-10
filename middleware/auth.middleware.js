@@ -14,6 +14,7 @@ module.exports.checkUser = (req, res, next) => {
         let user = await UserModel.findById(decodedToken.id);
         res.locals.user = user;
         next();
+        return req
         
       }
     });

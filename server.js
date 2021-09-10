@@ -34,10 +34,7 @@ app.get("/jwtid", requireAuth, (req, res) => {
 
 // routes
 app.use("/api/user", userRoutes);
-app.use("/api/project", checkUser, (req, res) => {
-  if (res.statusCode !== 401)
-    projectRoutes
-});
+app.use("/api/project", projectRoutes);
 app.use("/api/upload", uploadRoutes);
 
 //server
