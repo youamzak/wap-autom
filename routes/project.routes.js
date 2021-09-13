@@ -1,20 +1,18 @@
 const router = require('express').Router()
 const projectController = require('../controllers/project.controller')
 const { checkProjectIds } = require('../middleware/project.middleware')
-const { checkUser } = require("../middleware/auth.middleware");
 
-router.post('/addProject', checkUser,projectController.addProject)
-router.put('/updateProject/:id', checkUser,checkProjectIds,projectController.updateProject)
-router.delete('/removeProject/:id', checkUser,checkProjectIds, projectController.removeProject)
-router.get('/getProject/:id', checkUser,checkProjectIds, projectController.getProject)
-router.get('/getAllProjectLight', checkUser,checkProjectIds, projectController.getAllProjectLight)
-router.get('/getAllProjectFull', checkUser,checkProjectIds, projectController.getAllProjectFull)
-router.get('/getPasswordConnection/:id', checkUser,checkProjectIds, projectController.getPasswordConnection)
+router.post('/addProject', projectController.addProject)
+router.put('/updateProject/:id', checkProjectIds,projectController.updateProject)
+router.delete('/removeProject/:id', checkProjectIds, projectController.removeProject)
+router.get('/getProject/:id', checkProjectIds, projectController.getProject)
+router.get('/getAllProject', projectController.getAllProject)
+router.get('/getPasswordConnection/:id', checkProjectIds, projectController.getPasswordConnection)
 
-router.patch('/addComment/:id', checkUser,checkProjectIds, projectController.addComment)
-router.patch('/updateComment/:id', checkUser,checkProjectIds, projectController.updateComment)
-router.patch('/removeComment/:id', checkUser,checkProjectIds, projectController.removeComment)
-router.get('/getComment/:id',  checkUser,checkProjectIds,projectController.getComment)
-router.get('/getAllComment/:id', checkUser, checkProjectIds,projectController.getAllComment)
+router.patch('/addComment/:id', checkProjectIds, projectController.addComment)
+router.patch('/updateComment/:id', checkProjectIds, projectController.updateComment)
+router.patch('/removeComment/:id', checkProjectIds, projectController.removeComment)
+router.get('/getComment/:id',  checkProjectIds,projectController.getComment)
+router.get('/getAllComment/:id',  checkProjectIds,projectController.getAllComment)
 
 module.exports = router

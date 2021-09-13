@@ -34,8 +34,8 @@ app.get("/jwtid", requireAuth, (req, res) => {
 
 // routes
 app.use("/api/user", userRoutes);
-app.use("/api/project", projectRoutes);
-app.use("/api/upload", uploadRoutes);
+app.use("/api/project", checkUser, projectRoutes);
+app.use("/api/upload", checkUser, uploadRoutes);
 
 //server
 app.listen(process.env.PORT, () => {

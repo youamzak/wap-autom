@@ -46,7 +46,7 @@ const projectSchema = new mongoose.Schema(
               id: String,
               material: String,
               brand: String,
-              ref: String
+              reference: String
             }
           ]
         }
