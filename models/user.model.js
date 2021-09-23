@@ -1,34 +1,36 @@
 const mongoose = require('mongoose')
 const {isEmail} = require('validator')
 const bcrypt = require('bcrypt')
+const uniqueValidator = require('mongoose-unique-validator');
 
 const userSchema = new mongoose.Schema(
   {
     firstname: {
       type: String,
-      required: true,
-      minLength: 1,
-      maxLength: 55,
+      required: [true, "Firstname is required"],
+      minLength: [1, "Firstname must have at least 1 character"],
+      maxLength: [55, "Firstname must have at most 55 characters"],
       trim: true
     },
     name: {
       type: String,
-      required: true,
-      minlength: 1,
-      maxLength: 55,
-      trim: true
+      required: [true, "Name is required"],
+      minLength: [1, "Name must have at least 1 character"],
+      maxLength: [55, "Name must have at most 55 characters"],
+      trim: true,
+      unique: true,
     },
     email: {
       type: String,
-      required: true,
-      validate: [isEmail],
+      required: [true, "Email is required"],
+      validate: [isEmail, "Email address is not correct"],
       lowercase: true,
-      unique: true
+      unique: true,
     },
     password: {
       type: String,
-      required: true,
-      minLength: 8,
+      required: [true, "Password is required"],
+      minLength: [8, "Name must have at least 8 character"],
       max: 1024
     },
     service: {
@@ -60,6 +62,8 @@ userSchema.statics.login = async function(email, password) {
   }
   throw Error('Incorrect email')
 }
+
+userSchema.plugin(uniqueValidator, {message : "Error, expected {PATH} to be unique."});
 
 const UserModel = mongoose.model("user", userSchema)
 

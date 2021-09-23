@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon server -q -x"
+    "start": "nodemon server"
   },
   "keywords": [],
   "author": "",
@@ -18,8 +18,13 @@
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-unless": "^1.0.0",
+    "i18next": "^21.0.1",
+    "i18next-browser-languagedetector": "^6.1.2",
+    "i18next-fs-backend": "^1.1.1",
+    "i18next-http-middleware": "^3.1.4",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.5",
+    "mongoose-unique-validator": "^2.0.3",
     "multer": "^1.4.2",
     "node-opcua": "^2.47.0",
     "node-opcua-client": "^2.47.0",

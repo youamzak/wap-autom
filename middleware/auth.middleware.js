@@ -8,20 +8,17 @@ module.exports.checkUser = (req, res, next) => {
       if (err) {
         res.locals.user = null;
         res.cookie("jwt", "", { maxAge: 1 });
-        next();
-        return res.status(401).json("User unauthorized")
+        return res.status(401).json("User unauthorized");
       } else {
         let user = await UserModel.findById(decodedToken.id);
         res.locals.user = user;
         next();
-        return req
-        
+        return req;
       }
     });
   } else {
     res.locals.user = null;
-    next();
-    return res.status(401).json("No token")
+    return res.status(401).json("No token");
   }
 };
 

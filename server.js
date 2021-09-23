@@ -26,7 +26,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // jwt
-//app.use('*',checkUser)
 app.get("/jwtid", requireAuth, (req, res) => {
   if (res.locals.user) res.status(200).send(res.locals.user._id);
   else res.status(200).send(null);
