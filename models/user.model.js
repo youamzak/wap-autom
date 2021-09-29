@@ -52,15 +52,24 @@ userSchema.pre("save", async function(next){
   next()
 })
 
+const toto = (tmp) => {
+  return tmp
+}
+
 userSchema.statics.login = async function(email, password) {
   const user = await this.findOne({email})
+
   if(user){
     const auth = await bcrypt.compare(password, user.password)
     if(auth) 
+    {
+      user.password = undefined;   
       return user
+    }
     throw Error('Incorrect Password')
   }
   throw Error('Incorrect email')
+  
 }
 
 userSchema.plugin(uniqueValidator, {message : "Error, expected {PATH} to be unique."});
